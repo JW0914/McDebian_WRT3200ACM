@@ -1,0 +1,13 @@
+Renaming the port "ethernet" in the traditional "wan
+
+--- a/arch/arm/boot/dts/armada-xp-linksys-mamba.dts	2016-05-19 04:35:34.000000000 +0300
++++ b/arch/arm/boot/dts/armada-xp-linksys-mamba.dts	2016-05-30 22:29:21.359385280 +0300
+@@ -370,7 +370,7 @@
+ 
+ 			port@4 {
+ 				reg = <4>;
+-				label = "internet";
++				label = "wan";
+ 			};
+ 
+ 			port@5 {

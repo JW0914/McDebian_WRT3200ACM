@@ -1,0 +1,36 @@
+#!/bin/bash
+
+echo 255 > /sys/class/leds/mamba:amber:wan/brightness
+addr[1]='http://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&showintro=0&mimetype=plaintext'
+addr[2]='https://adaway.org/hosts.txt'
+addr[3]='hosts-file.net/ad_servers.txt'
+addr[4]='http://winhelp2002.mvps.org/hosts.txt'
+addr[5]='http://sysctl.org/cameleon/hosts'
+
+cd /home/tmp
+
+for ((i=1; i<=${#addr[*]}; i++)); do
+
+wget ${addr[$i]} --no-check-certificate -O ./hosts_list.$i
+
+sed -i 's/0.0.0.0/127.0.0.1/' ./hosts_list.$i
+sed -i '/127.0.0.1/{x;p;x;G;}' ./hosts_list.$i
+sed -i 's/\t/ /g' ./hosts_list.$i
+sed -i 's/  / /g' ./hosts_list.$i
+
+done
+
+in="./hosts_list.*" && out="/etc/banner_add_hosts" && host='127.0.0.1'
+echo "#/ip dns static" > $out && grep '127.0.0.1 ' $in \
+	| grep -v '^#' \
+        | cut -d' ' -f 2 \
+        | grep . \
+	| tr -d '\r' \
+	| sort -u \
+	| sed '$!N; /^\(.*\)\n\1$/!P; D' \
+	| sed "s/^/$host /" >> $out && rm -f $in
+wc -l $out
+
+/etc/init.d/dnsmasq restart
+echo 0 > /sys/class/leds/mamba:amber:wan/brightness
+

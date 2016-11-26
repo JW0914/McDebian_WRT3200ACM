@@ -1,0 +1,15 @@
+#!/bin/sh
+echo "patch.fan"
+patch -p1 < ./patch.fan
+echo "patch.bm"
+patch -p1 < ./patch.bm
+echo "patch.pxa3"
+patch -p1 < ./patch.pxa3
+echo "patch.wifi"
+patch -p1 < ./patch.wifi
+echo "patch.wan"
+patch -p1 < ./patch.wan
+echo "patch.eth1"
+patch -p1 < ./patch.eth1
+echo "patch.mw"
+patch -p1 < ./patch.mw

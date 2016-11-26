@@ -1,0 +1,106 @@
+#!/bin/bash
+#
+echo "1" > /proc/sys/net/ipv4/ip_forward
+echo "1" > /proc/sys/net/ipv4/ip_dynaddr
+
+ modprobe iptable_nat
+ modprobe ip_conntrack_ftp
+ modprobe ip_nat_ftp
+
+#
+WAN=wan
+WAN_IP=$(ifconfig wan | sed -n '/inet addr:/s/^[^:]*:\([0-9\.]*\).*/\1/gp')
+
+#
+LAN=br-lan
+LAN_IP=192.168.1.1
+LAN_RG=192.168.1.0/24
+NAS_IP=192.168.1.100
+
+# PE - port external
+# PI - port internal
+# Pr - protocol
+
+PE[1]=5000;PI[1]=5000;Pr[1]=tcp
+PE[2]=5001;PI[2]=5001;Pr[2]=tcp
+PE[3]=6881;PI[3]=6881;Pr[3]=tcp
+PE[4]=6881;PI[4]=6881;Pr[4]=udp
+PE[5]=6882;PI[5]=6882;Pr[5]=tcp
+PE[6]=80;PI[6]=80;Pr[6]=tcp
+PE[7]=443;PI[7]=443;Pr[7]=tcp
+PE[8]=5005;PI[8]=5005;Pr[8]=tcp
+PE[9]=5006;PI[9]=5006;Pr[9]=tcp
+PE[10]=7000;PI[10]=7000;Pr[10]=tcp
+PE[11]=7001;PI[11]=7001;Pr[11]=tcp
+PE[12]=8081;PI[12]=8081;Pr[12]=tcp
+PE[13]=8800;PI[13]=8800;Pr[13]=tcp
+PE[14]=8801;PI[14]=8801;Pr[14]=tcp
+PE[15]=9007;PI[15]=9007;Pr[15]=tcp
+PE[16]=9008;PI[16]=9008;Pr[16]=tcp
+PE[17]=20;PI[17]=20;Pr[17]=tcp
+PE[18]=21;PI[18]=21;Pr[18]=tcp
+PE[19]=55536;PI[19]=55536;Pr[19]=tcp
+PE[20]=55537;PI[20]=55537;Pr[20]=tcp
+PE[21]=55538;PI[21]=55538;Pr[21]=tcp
+PE[22]=55539;PI[22]=55539;Pr[22]=tcp
+
+
+iptables -F
+iptables -F -t nat
+iptables -F -t mangle
+iptables -X
+iptables -t nat -X
+iptables -t mangle -X
+
+# 
+iptables -P INPUT DROP
+iptables -P OUTPUT ACCEPT
+iptables -P FORWARD DROP
+
+# loopback
+iptables -A INPUT -i lo -j ACCEPT
+iptables -A OUTPUT -o lo -j ACCEPT
+iptables -A INPUT -i $LAN -j ACCEPT
+iptables -A OUTPUT -o $LAN -j ACCEPT
+
+#ESTABLISHED
+iptables -A INPUT -p all -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -p all -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+
+iptables -A FORWARD -p all -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+iptables -A INPUT -p tcp --dport ssh -i $LAN -j ACCEPT
+#iptables -A INPUT -p tcp --dport 22 -j LED --led-trigger-id ssh --led-delay 1000
+#iptables -A INPUT -p igmp -j ACCEPT
+#iptables -A INPUT -i $LAN -p icmp --icmp -j ACCEPT
+iptables -A FORWARD -s $LAN_RG -p icmp --icmp-type echo-request -j ACCEPT
+
+#MTU
+iptables -I FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+
+#
+iptables -A INPUT -m state --state INVALID -j DROP
+iptables -A FORWARD -m state --state INVALID -j DROP
+
+#
+iptables -A INPUT -p tcp ! --syn -m state --state NEW -j DROP
+iptables -A OUTPUT -p tcp ! --syn -m state --state NEW -j DROP
+
+#
+iptables -A FORWARD -i $LAN -o $WAN -j ACCEPT
+
+#
+iptables -A FORWARD -i $WAN -o $LAN -j DROP
+
+iptables -t nat -A POSTROUTING -o $WAN -s $LAN_RG -j MASQUERADE
+
+#
+printf "Open port:"\\n
+printf "Int"\\t"Ext"\\t"Prot"\\n
+for ((i=1; i<=${#Pr[*]}; i++)); do
+iptables -t nat -A PREROUTING -d $WAN_IP -p ${Pr[$i]} -m ${Pr[$i]} --dport ${PE[$i]} -j DNAT --to-destination $NAS_IP:${PI[$i]}
+iptables -t nat -A POSTROUTING -d $LAN_IP -p ${Pr[$i]} -m ${Pr[$i]} --dport ${PI[$i]} -j SNAT --to-source $NAS_IP
+iptables -t nat -A OUTPUT -d $WAN_IP -p ${Pr[$i]} -m ${Pr[$i]} --dport ${PE[$i]} -j DNAT --to-destination $NAS_IP:${PI[$i]}
+iptables -I FORWARD 1 -i $WAN -o $LAN -d $NAS_IP -p ${Pr[$i]} -m ${Pr[$i]} --dport ${PI[$i]} -j ACCEPT
+printf ${PI[$i]}\\t${PE[$i]}\\t${Pr[$i]}\\n
+done
+printf \\n

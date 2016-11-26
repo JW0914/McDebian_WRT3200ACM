@@ -1,0 +1,35 @@
+--- a/arch/arm/boot/dts/armada-xp.dtsi	2016-05-16 01:43:13.000000000 +0300
++++ b/arch/arm/boot/dts/armada-xp.dtsi	2016-06-01 20:43:04.000000000 +0300
+@@ -258,7 +258,9 @@
+ 				reg = <0xc0000 0xac>;
+ 				clocks = <&gateclk 13>;
+ 				internal-mem = <&bm_bppi>;
+-				status = "disabled";
++				status = "okay";
++				pool2,capacity = <4096>;
++				pool1,pkt-size = <512>;
+ 			};
+ 
+ 			xor@f0900 {
+@@ -308,7 +310,7 @@
+ 			#size-cells = <1>;
+ 			clocks = <&gateclk 13>;
+ 			no-memory-wc;
+-			status = "disabled";
++			status = "okay";
+ 		};
+ 	};
+ 
+--- a/arch/arm/boot/dts/armada-xp-linksys-mamba.dts	2016-05-16 01:43:13.000000000 +0300
++++ b/arch/arm/boot/dts/armada-xp-linksys-mamba.dts	2016-06-02 02:43:19.168475655 +0300
+@@ -71,8 +71,8 @@
+ 		ranges = <MBUS_ID(0xf0, 0x01) 0 0 0xf1000000 0x100000
+ 			  MBUS_ID(0x01, 0x1d) 0 0 0xfff00000 0x100000
+ 			  MBUS_ID(0x09, 0x09) 0 0 0xf1100000 0x10000
+-			  MBUS_ID(0x09, 0x05) 0 0 0xf1110000 0x10000>;
+-
++			  MBUS_ID(0x09, 0x05) 0 0 0xf1110000 0x10000
++			  MBUS_ID(0x0c, 0x04) 0 0 0xf1200000 0x100000>;
+ 		pcie-controller {
+ 			status = "okay";
+ 
