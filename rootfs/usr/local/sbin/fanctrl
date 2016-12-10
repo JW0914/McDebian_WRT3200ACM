@@ -14,7 +14,7 @@ Temp_Switch=$((Temp_Task-Temp_Switch))
 K_Prop=500	# 50...720
 K_Dif=90	# 10...100
 K_FanOn=70	# The smallest value at the output pwm1 (gpio 24) control in which the fan is spinning.
-		# You should choose a small margin +3...+5
+		# You should increase it by 3...5 units (K_FanOn=66+4)
 Temp_Previous=$Temp_Task
 
 ############
