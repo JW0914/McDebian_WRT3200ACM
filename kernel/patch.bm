@@ -1,3 +1,4 @@
+diff -Naur a/arch/arm/boot/dts/armada-xp.dtsi b/arch/arm/boot/dts/armada-xp.dtsi
 --- a/arch/arm/boot/dts/armada-xp.dtsi	2016-05-16 01:43:13.000000000 +0300
 +++ b/arch/arm/boot/dts/armada-xp.dtsi	2016-06-01 20:43:04.000000000 +0300
 @@ -258,7 +258,9 @@
@@ -19,17 +20,24 @@
 +			status = "okay";
  		};
  	};
- 
---- a/arch/arm/boot/dts/armada-xp-linksys-mamba.dts	2016-05-16 01:43:13.000000000 +0300
-+++ b/arch/arm/boot/dts/armada-xp-linksys-mamba.dts	2016-06-02 02:43:19.168475655 +0300
-@@ -71,8 +71,8 @@
- 		ranges = <MBUS_ID(0xf0, 0x01) 0 0 0xf1000000 0x100000
- 			  MBUS_ID(0x01, 0x1d) 0 0 0xfff00000 0x100000
- 			  MBUS_ID(0x09, 0x09) 0 0 0xf1100000 0x10000
+
+diff -Naur a/arch/arm/boot/dts/armada-xp-linksys-mamba.dts b/arch/arm/boot/dts/armada-xp-linksys-mamba.dts
+--- a/arch/arm/boot/dts/armada-xp-linksys-mamba.dts       2017-01-02 01:31:53.000000000 +0300
++++ b/arch/arm/boot/dts/armada-xp-linksys-mamba.dts       2017-01-08 01:38:33.700123984 +0300
+@@ -64,14 +64,15 @@
+
+	memory@0 {
+		device_type = "memory";
+-		reg = <0x00000000 0x00000000 0x00000000 0x10000000>; /* 256MB */
++		reg = <0x00000000 0x00000000 0x00000000 0x20000000>; /* 512MB */
+	};
+
+	soc {
+		ranges = <MBUS_ID(0xf0, 0x01) 0 0 0xf1000000 0x100000
+			  MBUS_ID(0x01, 0x1d) 0 0 0xfff00000 0x100000
+			  MBUS_ID(0x09, 0x09) 0 0 0xf1100000 0x10000
 -			  MBUS_ID(0x09, 0x05) 0 0 0xf1110000 0x10000>;
--
 +			  MBUS_ID(0x09, 0x05) 0 0 0xf1110000 0x10000
 +			  MBUS_ID(0x0c, 0x04) 0 0 0xf1200000 0x100000>;
- 		pcie-controller {
- 			status = "okay";
- 
+
+		internal-regs { 
