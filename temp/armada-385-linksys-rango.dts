@@ -440,7 +440,7 @@
 	};
 
 	xhci0_vbus_pins: xhci0-vbus-pins {
-		marvell,pins = "mpp47";
+		marvell,pins = "mpp48";
 		marvell,function = "gpio";
 	};
 };
