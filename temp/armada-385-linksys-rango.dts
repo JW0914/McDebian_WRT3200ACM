@@ -5,7 +5,7 @@
  *
  *
  * This file is dual-licensed: you can use it either under the terms
- * of the GPL or the X11 license,@your option. Note that this dual
+ * of the GPL or the X11 license, at your option. Note that this dual
  * licensing only applies to this file, and not this project as a
  * whole.
  *
@@ -101,7 +101,7 @@
 						reg = <0x2>;
 					};
 
-					wlan_5g@3 {
+					wlan_5g@2 {
 						label = "rango:white:wlan_5g";
 						reg = <0x3>;
 					};
@@ -162,7 +162,7 @@
 				};
 			};
 
-			mdio {
+			mdio@72004 {
 				status = "okay";
 			};
 
@@ -187,11 +187,12 @@
 			/* USB part of the eSATA/USB 2.0 port */
 			usb@58000 {
 				status = "okay";
+				usb2 = <&usb2_phy>;
 			};
 
 			usb3@f8000 {
 				status = "okay";
-				usb-phy = <&usb3_phy>;
+				usb3 = <&usb3_phy>;
 			};
 
 			flash@d0000 {
@@ -303,10 +304,27 @@
 		};
 	};
 
+	usb2_phy: usb2_phy {
+		compatible = "usb-nop-xceiv";
+		vcc-supply_usb2 = <&reg_ehci0_vbus>;
+	};
+
 	usb3_phy: usb3_phy {
 		compatible = "usb-nop-xceiv";
-		vcc-supply = <&reg_xhci0_vbus>;
+		vcc-supply_usb3 = <&reg_xhci0_vbus>;
 	};
+
+	reg_ehci0_vbus: ehci0-vbus {
+		compatible = "regulator-fixed";
+		pinctrl-names = "default";
+		pinctrl-0 = <&ehci0_vbus_pins>;
+		regulator-name = "ehci0-vbus";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		enable-active-high;
+		regulator-always-on;
+		gpios = <&gpio1 15 GPIO_ACTIVE_HIGH>;
+	};		
 
 	reg_xhci0_vbus: xhci0-vbus {
 		compatible = "regulator-fixed";
@@ -316,14 +334,14 @@
 		regulator-min-microvolt = <5000000>;
 		regulator-max-microvolt = <5000000>;
 		enable-active-high;
-		gpio = <&gpio1 16 GPIO_ACTIVE_HIGH>;
+		gpios = <&gpio1 12 GPIO_ACTIVE_HIGH>;
 	};
 
 	gpio_keys {
 		compatible = "gpio-keys";
 		#address-cells = <1>;
 		#size-cells = <0>;
-		pinctrl-0 = <&keys_pin>;
+		pinctrl-0 = <&reset_key_pin &wps_key_pin>;
 		pinctrl-names = "default";
 
 		button@1 {
@@ -344,15 +362,23 @@
 		pinctrl-0 = <&power_led_pin &sata_led_pin>;
 		pinctrl-names = "default";
 
+		sata {
+			label = "rango:white:sata";
+			gpios = <&gpio0 21 GPIO_ACTIVE_LOW>;
+			linux,default-trigger = "disk-activity";
+		};
+
 		power {
+			label = "rango:white:power";
 			gpios = <&gpio1 24 GPIO_ACTIVE_HIGH>;
 			default-state = "on";
 		};
+	};
 
-		sata {
-			gpios = <&gpio0 21 GPIO_ACTIVE_LOW>;
-			default-state = "off";
-		};
+	pwm_fan {
+		/* SUNON HA4010V4-0000-C99 */
+		compatible = "pwm-fan";
+		pwms = <&gpio0 18 4000 0>;
 	};
 
 	dsa@0 {
@@ -400,37 +426,12 @@
 		};
 	};
 
-	gpio-leds {
-		power {
-			label = "rango:white:power";
-		};
-
-		sata {
-			label = "rango:white:sata";
-		};
-	};
-
-	mvsw61xx {
-		#address-cells = <1>;
-		#size-cells = <0>;
-		compatible = "marvell,88e6352";
-		status = "okay";
-
-		mii-bus = <&mdio>;
-		cpu-port-0 = <5>;
-		cpu-port-1 = <6>;
-	};
-
 };
 
 &pinctrl {
-	keys_pin: keys-pin {
-		marvell,pins = "mpp24", "mpp29";
-		marvell,function = "gpio";
-	};
 
-	power_led_pin: power-led-pin {
-		marvell,pins = "mpp56";
+	gpio_fan_pin: gpio-fan-pin {
+		marvell,pins = "mpp18";
 		marvell,function = "gpio";
 	};
 
@@ -439,8 +440,32 @@
 		marvell,function = "gpio";
 	};
 
+	wps_key_pin: wps-key-pin {
+		marvell,pins = "mpp24";
+		marvell,function = "gpio";
+	};
+
+	reset_key_pin: reset-key-pin {
+		marvell,pins = "mpp29";
+		marvell,function = "gpio";
+	};
+
 	xhci0_vbus_pins: xhci0-vbus-pins {
-		marvell,pins = "mpp48";
+		marvell,pins = "mpp44";
+		marvell,function = "gpio";
+	};
+
+	ehci0_vbus_pins: ehci0-vbus-pins {
+		marvell,pins = "mpp47";
+		marvell,function = "gpio";
+	};
+
+	sdhci_pins: sdhci-pins {
+		marvell,function = "gpio";
+	};
+
+	power_led_pin: power-led-pin {
+		marvell,pins = "mpp56";
 		marvell,function = "gpio";
 	};
 };
