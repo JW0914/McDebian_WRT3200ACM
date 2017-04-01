@@ -101,7 +101,7 @@
 						reg = <0x2>;
 					};
 
-					wlan_5g@2 {
+					wlan_5g@3 {
 						label = "rango:white:wlan_5g";
 						reg = <0x3>;
 					};
@@ -186,13 +186,13 @@
 
 			/* USB part of the eSATA/USB 2.0 port */
 			usb@58000 {
+				usb_power = <&reg_5v>;
 				status = "okay";
-				usb2 = <&usb2_phy>;
 			};
 
 			usb3@f8000 {
+				usb_power = <&reg_5v>;
 				status = "okay";
-				usb3 = <&usb3_phy>;
 			};
 
 			flash@d0000 {
@@ -304,37 +304,35 @@
 		};
 	};
 
-	usb2_phy: usb2_phy {
+	reg_5v: regulators {
 		compatible = "usb-nop-xceiv";
-		vcc-supply_usb2 = <&reg_ehci0_vbus>;
-	};
+		#address-cells = <1>;
+		#size-cells = <0>;
 
-	usb3_phy: usb3_phy {
-		compatible = "usb-nop-xceiv";
-		vcc-supply_usb3 = <&reg_xhci0_vbus>;
-	};
+			usb2_esata_power: regulator@1 {
+				compatible = "regulator-fixed";
+				reg = <1>;
+				pinctrl-names = "default";
+				pinctrl-0 = <&usb_esata_pin>;
+				regulator-name = "USB2.0/eSATA Port Power";
+				regulator-min-microvolt = <5000000>;
+				regulator-max-microvolt = <5000000>;
+				enable-active-high;
+				regulator-always-on;
+				gpios = <&gpio1 15 GPIO_ACTIVE_HIGH>;
+			};		
 
-	reg_ehci0_vbus: ehci0-vbus {
-		compatible = "regulator-fixed";
-		pinctrl-names = "default";
-		pinctrl-0 = <&ehci0_vbus_pins>;
-		regulator-name = "ehci0-vbus";
-		regulator-min-microvolt = <5000000>;
-		regulator-max-microvolt = <5000000>;
-		enable-active-high;
-		regulator-always-on;
-		gpios = <&gpio1 15 GPIO_ACTIVE_HIGH>;
-	};		
-
-	reg_xhci0_vbus: xhci0-vbus {
-		compatible = "regulator-fixed";
-		pinctrl-names = "default";
-		pinctrl-0 = <&xhci0_vbus_pins>;
-		regulator-name = "xhci0-vbus";
-		regulator-min-microvolt = <5000000>;
-		regulator-max-microvolt = <5000000>;
-		enable-active-high;
-		gpios = <&gpio1 12 GPIO_ACTIVE_HIGH>;
+			usb3_power: regulator@2 {
+				compatible = "regulator-fixed";
+				reg = <2>;
+				pinctrl-names = "default";
+				pinctrl-0 = <&usb3_pin>;
+				regulator-name = "USB3.0 Port Power";
+				regulator-min-microvolt = <5000000>;
+				regulator-max-microvolt = <5000000>;
+				enable-active-high;
+				gpios = <&gpio1 12 GPIO_ACTIVE_HIGH>;
+			};
 	};
 
 	gpio_keys {
@@ -450,12 +448,12 @@
 		marvell,function = "gpio";
 	};
 
-	xhci0_vbus_pins: xhci0-vbus-pins {
+	usb3_pin: usb3-pin {
 		marvell,pins = "mpp44";
 		marvell,function = "gpio";
 	};
 
-	ehci0_vbus_pins: ehci0-vbus-pins {
+	usb_esata_pin: usb-esata-pins {
 		marvell,pins = "mpp47";
 		marvell,function = "gpio";
 	};
