@@ -1,2 +1,2 @@
-# McDebian_WRT1900AC-v1-
+# McDebian_WRT3200ACM
 For installation and use on wrt3200 Debian.
