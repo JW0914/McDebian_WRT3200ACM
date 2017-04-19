@@ -679,4 +679,48 @@ Signed-off-by: Andrew Lunn <andrew@lunn.ch>
  
  	mvsw61xx {
 
+Signed-off-by: valcher
+---
+ arch/arm/boot/dts/armada-38x.dtsi | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+--- a/arch/arm/boot/dts/armada-38x.dtsi 2017-03-18 14:19:00.000000000 +0300
++++ b/arch/arm/boot/dts/armada-38x.dtsi 2017-03-20 01:29:32.000000000 +0300
+@@ -313,28 +313,34 @@
+			gpio0: gpio@18100 {
+				compatible = "marvell,orion-gpio";
+-				reg = <0x18100 0x40>;
++				reg = <0x18100 0x40>, <0x181c0 0x08>;
++				reg-names = "gpio", "pwm";
+				ngpios = <32>;
+				gpio-controller;
+				#gpio-cells = <2>;
++				#pwm-cells = <2>;
+				interrupt-controller;
+				#interrupt-cells = <2>;
++				clocks = <&coreclk 0>;
+				interrupts = <GIC_SPI 53 IRQ_TYPE_LEVEL_HIGH>,
+					     <GIC_SPI 54 IRQ_TYPE_LEVEL_HIGH>,
+					     <GIC_SPI 55 IRQ_TYPE_LEVEL_HIGH>,
+					     <GIC_SPI 56 IRQ_TYPE_LEVEL_HIGH>;
+			};
+
+			gpio1: gpio@18140 {
+				compatible = "marvell,orion-gpio";
+-				reg = <0x18140 0x40>;
++				reg = <0x18140 0x40>, <0x181c8 0x08>;
++				reg-names = "gpio", "pwm";
+				ngpios = <28>;
+				gpio-controller;
+				#gpio-cells = <2>;
++				#pwm-cells = <2>;
+				interrupt-controller;
+				#interrupt-cells = <2>;
++				clocks = <&coreclk 0>;
+				interrupts = <GIC_SPI 58 IRQ_TYPE_LEVEL_HIGH>,
+					     <GIC_SPI 59 IRQ_TYPE_LEVEL_HIGH>,
+					     <GIC_SPI 60 IRQ_TYPE_LEVEL_HIGH>,
+					     <GIC_SPI 61 IRQ_TYPE_LEVEL_HIGH>;
+			};
+
 

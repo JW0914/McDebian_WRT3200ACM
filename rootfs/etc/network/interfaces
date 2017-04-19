@@ -1,31 +1,53 @@
+
 # interfaces(5) file used by ifup(8) and ifdown(8)
 
 auto lo
-	iface lo inet loopback
+iface lo inet loopback
+	post-up ifconfig lo txqueuelen 1000
 
-allow-hotplug eth0
-	iface eth0 inet static
+allow-hotplug eth1
+	iface eth1 inet static
 	address 0.0.0.0
-	post-up ifconfig eth0 txqueuelen 1000
+	post-up ifconfig eth1 txqueuelen 1000
+	post-up ethtool -K eth1 gro off
 
+allow-hotplug lan1
+	iface lan1 inet manual
+allow-hotplug lan2
+	iface lan2 inet manual
+allow-hotplug lan3
+	iface lan3 inet manual
+allow-hotplug lan4
+	iface lan4 inet manual
+
+#auto wlan0
 allow-hotplug wlan0
 	iface wlan0 inet manual
-	hostapd /etc/hostapd/hostapd_0.conf
+	hostapd /etc/hostapd/wlan0.conf
 
+#auto wlan1
 allow-hotplug wlan1
 	iface wlan1 inet manual
-	hostapd /etc/hostapd/hostapd_1.conf
+	hostapd /etc/hostapd/wlan1.conf
 
+allow-hotplug mlan0
+	iface mlan0 inet manual
+	hostapd /etc/hostapd/mlan0.conf
+
+#auto br-lan
 allow-hotplug br-lan
 	iface br-lan inet static
-	bridge_ports lan1 lan2 lan3 lan4 wlan0 wlan1
+	bridge_ports eth1 lan1 lan2 lan3 lan4 wlan0 wlan1 mlan0
 	address 192.168.1.1
 	netmask 255.255.255.0
 	network 192.168.1.0
 	broadcast 192.168.1.255
 	dns-nameserver 8.8.8.8 8.8.4.4
+	post-up ethtool -K br-lan gro off
 
+#auto wan
 allow-hotplug wan
 	iface wan inet dhcp
-	hwaddress ether 12:34:56:78:90:AB
+	hwaddress ether 11:22:33:44:55:66
+	post-up ethtool -K wan gro off gso off
 	post-up /etc/iptables
