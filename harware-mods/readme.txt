@@ -1,7 +1,7 @@
 Hardware Mods for WRT3200.
 Scheme connecting the fan to the board and patch control.
 
-The blue color on the diagram shows the elements and circuits existing on the wrt3200acm board.
+The blue color on the scheme (scheme.png) shows the elements and circuits existing on the wrt3200acm board.
 Items shown in red must be installed on the designated places on the board.
 Resistor "+ R" and capacitor "+ C", for which there is no place for the board, it is necessary to solder to existing elements, as shown in the diagram and photo. Red points on the diagram indicate the places of soldering.
 The J13 connector for the fan can be selected at your discretion.
