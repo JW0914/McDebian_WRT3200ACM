@@ -31,9 +31,9 @@ for ((i=1; i<${#T[*]}; i++)); do
 T=$((T[$i]))
 
 	if [ $T -gt $Temp_Current ]
-	then
-	Temp_Current=$T
-fi
+		then
+		Temp_Current=$T
+	fi
 #printf  $T\\t
 done
 
@@ -46,33 +46,33 @@ FctrDif=$(((Temp_Current-Temp_Previous)/K_Dif))
 
 ############ Reducing regulatory factor in the area of the set temperature ±0.725° (476)
 	if [ $Error -ge -476 -a $Error -le 476 ]
-	then
-#	FctrProp=$((FctrProp/4))
-	FctrDif=$((FctrDif/3))
-fi
+		then
+		#FctrProp=$((FctrProp/4))
+		FctrDif=$((FctrDif/3))
+	fi
 
 FanCtrl=$((FctrProp + FctrDif + FanCtrl))
 
 ########### Setting the working range of the fan
 	if [ $FanCtrl -gt 255 ]
-	then
+		then
                 FanCtrl=255
-fi
+	fi
 	if [ $FanCtrl -lt $K_FanOn ]
-	then
-	Out_FanCtrl=0
-	else
-	Out_FanCtrl=$FanCtrl
-fi
+		then
+		Out_FanCtrl=0
+		else
+		Out_FanCtrl=$FanCtrl
+	fi
 	if [ $FanCtrl -lt $((K_FanOn-4)) ]
-	then
-	FanCtrl=$((K_FanOn-4))
-fi
+		then
+		FanCtrl=$((K_FanOn-4))
+	fi
 	if [ $FanCtrl -ge 255 -a $Temp_Current -ge $((Temp_Task+5000)) ]
-	then
-	echo "`date`: Dangerous Temperature" >> /root/overheat.log
-	echo `sensors|grep +` >> /root/overheat.log
-fi
+		then
+		echo "`date`: Dangerous Temperature" >> /root/overheat.log
+		echo `sensors|grep +` >> /root/overheat.log
+	fi
 
 ########### Out fan
 echo $Out_FanCtrl > /sys/class/hwmon/hwmon0/pwm1
