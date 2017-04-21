@@ -105,7 +105,7 @@ diff -Naur a/arch/arm/boot/dts/armada-385-linksys-rango.dts b/arch/arm/boot/dts/
 +						reg = <0x2>;
 +					};
 +
-+					wlan_5g@2 {
++					wlan_5g@3 {
 +						label = "rango:white:wlan_5g";
 +						reg = <0x3>;
 +					};
