@@ -11,9 +11,11 @@
 #
 # By default this script does nothing.
 
-#echo 2 > /proc/irq/29/smp_affinity
-#echo 2 > /proc/irq/91/smp_affinity
+depmod -a
+
+echo 1 > /sys/class/leds/rango:white:usb2/ports/usb1-port1
+echo 1 > /sys/class/leds/rango:white:usb3_1/ports/usb2-port1
 echo 16384 > /proc/sys/vm/min_free_kbytes
-sleep 45 ; /etc/upd-adblock #; /etc/upd-oinkmaster
+sleep 20 ; /etc/upd-adblock #; /etc/upd-oinkmaster
 
 exit 0
