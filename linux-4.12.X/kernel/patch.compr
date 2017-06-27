@@ -1,0 +1,20 @@
+ arch/arm/boot/compressed/efi-header.S | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/compressed/efi-header.S b/arch/arm/boot/compressed/efi-header.S
+index 3f7d1b74c5e0..a17ca8d78656 100644
+--- a/arch/arm/boot/compressed/efi-header.S
++++ b/arch/arm/boot/compressed/efi-header.S
+@@ -17,7 +17,8 @@
+ 		@ there.
+ 		.inst	'M' | ('Z' << 8) | (0x1310 << 16)   @ tstne r0, #0x4d000
+ #else
+-		W(mov)	r0, r0
++ AR_CLASS(	mov	r0, r0		)
++  M_CLASS(	nop.w			)
+ #endif
+ 		.endm
+ 
+-- 
+2.9.3
+

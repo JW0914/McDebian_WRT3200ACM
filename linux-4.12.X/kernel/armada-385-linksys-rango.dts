@@ -166,6 +166,54 @@
 
 			mdio@72004 {
 				status = "okay";
+
+				switch@0 {
+				compatible = "marvell,mv88e6085";
+				#address-cells = <1>;
+				#size-cells = <0>;
+				reg = <0>;
+
+					ports {
+						#address-cells = <1>;
+						#size-cells = <0>;
+
+						port@0 {
+							reg = <0>;
+							label = "lan4";
+						};
+
+						port@1 {
+							reg = <1>;
+							label = "lan3";
+						};
+
+						port@2 {
+							reg = <2>;
+							label = "lan2";
+						};
+
+						port@3 {
+							reg = <3>;
+							label = "lan1";
+						};
+
+						port@4 {
+							reg = <4>;
+							label = "wan";
+						};
+
+						port@5 {
+							reg = <5>;
+							label = "cpu";
+							ethernet = <&eth2>;
+
+							fixed-link {
+								speed = <1000>;
+								full-duplex;
+							};
+						};
+					};
+				};
 			};
 
 			bm@c8000 {
@@ -183,7 +231,7 @@
 				#size-cells = <0>;
 				no-1-8-v;
 				wp-inverted;
-				broken-cd;
+				non-removable;
 				bus-width = <8>;
 				status = "okay";
 			};
@@ -326,7 +374,7 @@
 	usb2_phy: usb2_phy {
 		compatible = "usb-nop-xceiv";
 	
-		usb-sata-vbus {
+		usb_esata_vbus {
 		compatible = "regulator-fixed";
 		pinctrl-names = "default";
 		pinctrl-0 = <&usb_esata_vbus_pin>;
@@ -343,16 +391,16 @@
 		compatible = "gpio-keys";
 		#address-cells = <1>;
 		#size-cells = <0>;
-		pinctrl-0 = <&reset_key_pin &wps_key_pin>;
+		pinctrl-0 = <&keys_pin>;
 		pinctrl-names = "default";
 
-		button@1 {
+		wps {
 			label = "WPS";
 			linux,code = <KEY_WPS_BUTTON>;
 			gpios = <&gpio0 24 GPIO_ACTIVE_LOW>;
 		};
 
-		button@2 {
+		reset {
 			label = "Factory Reset Button";
 			linux,code = <KEY_RESTART>;
 			gpios = <&gpio0 29 GPIO_ACTIVE_LOW>;
@@ -377,52 +425,7 @@
 		};
 	};
 
-	dsa@0 {
-		compatible = "marvell,dsa";
-		#address-cells = <2>;
-		#size-cells = <0>;
-
-		dsa,ethernet = <&eth2>;
-		dsa,mii-bus = <&mdio>;
-
-		switch@0 {
-			#address-cells = <1>;
-			#size-cells = <0>;
-			reg = <0x0 0>;	/* MDIO address 0, switch 0 in tree */
-
-			port@0 {
-				reg = <0>;
-				label = "lan4";
-			};
-
-			port@1 {
-				reg = <1>;
-				label = "lan3";
-			};
-
-			port@2 {
-				reg = <2>;
-				label = "lan2";
-			};
-
-			port@3 {
-				reg = <3>;
-				label = "lan1";
-			};
-
-			port@4 {
-				reg = <4>;
-				label = "wan";
-			};
-
-			port@5 {
-				reg = <5>;
-				label = "cpu";
-			};
-		};
-	};
-
-	mvsw61xx {
+	swconfig {
 		#address-cells = <1>;
 		#size-cells = <0>;
 		compatible = "marvell,88e6352";
@@ -436,18 +439,18 @@
 
 &pinctrl {
 
+	gpio_fan_pin: gpio-fan-pin {
+		marvell,pins = "mpp18";
+		marvell,function = "gpio";
+	};
+
 	sata_led_pin: sata-led-pin {
 		marvell,pins = "mpp21";
 		marvell,function = "gpio";
 	};
 
-	wps_key_pin: wps-key-pin {
-		marvell,pins = "mpp24";
-		marvell,function = "gpio";
-	};
-
-	reset_key_pin: reset-key-pin {
-		marvell,pins = "mpp29";
+	keys_pin: keys-pin {
+		marvell,pins = "mpp24", "mpp29";
 		marvell,function = "gpio";
 	};
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DATE=`stat /etc/banner_add_hosts |grep Modify`
+DATE=`stat /etc/adblock |grep Modify`
 DATE=${DATE:8:10}
 
 if [ $(date '+%Y-%m-%d') = $DATE ]
@@ -41,7 +41,7 @@ for ((i=1; i<=${#addr[*]}; i++)); do
 
 done
 
-in="hosts_list.*" && out="/etc/banner_add_hosts" && host='127.0.0.1'
+in="hosts_list.*" && out="/etc/adblock" && host='127.0.0.1'
 
 echo "#/ip dns static" > $out && grep '127.0.0.1 ' $in \
 	| grep -v '^#' \
