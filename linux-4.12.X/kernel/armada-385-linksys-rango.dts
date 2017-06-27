@@ -439,11 +439,6 @@
 
 &pinctrl {
 
-	gpio_fan_pin: gpio-fan-pin {
-		marvell,pins = "mpp18";
-		marvell,function = "gpio";
-	};
-
 	sata_led_pin: sata-led-pin {
 		marvell,pins = "mpp21";
 		marvell,function = "gpio";
