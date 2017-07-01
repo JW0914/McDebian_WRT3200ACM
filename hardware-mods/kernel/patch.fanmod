@@ -74,3 +74,31 @@ index f1a0e25..6955370 100644
 -- 
 2.10.2
 
+diff -Naur a/arch/arm/boot/dts/armada-385-linksys-rango.dts b/arch/arm/boot/dts/armada-385-linksys-rango.dts
+--- a/arch/arm/boot/dts/armada-385-linksys-rango.dts	2017-06-27 16:51:46.000000000 +0300
++++ b/arch/arm/boot/dts/armada-385-linksys-rango.dts	2017-06-04 09:31:32.000000000 +0300
+@@ -425,6 +425,12 @@
+ 		};
+ 	};
+ 
++	pwm_fan {
++		/* SUNON HA4010V4-0000-C99 */
++		compatible = "pwm-fan";
++		pwms = <&gpio0 18 4000 0>;
++	};
++
+ 	swconfig {
+ 		#address-cells = <1>;
+ 		#size-cells = <0>;
+@@ -439,6 +445,11 @@
+ 
+ &pinctrl {
+ 
++	gpio_fan_pin: gpio-fan-pin {
++		marvell,pins = "mpp18";
++		marvell,function = "gpio";
++	};
++
+ 	sata_led_pin: sata-led-pin {
+ 		marvell,pins = "mpp21";
+ 		marvell,function = "gpio";
