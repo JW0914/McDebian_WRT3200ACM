@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DATE=`stat /etc/adblock |grep Modify`
+DATE=`stat /etc/adblock.blacklist |grep Modify`
 DATE=${DATE:8:10}
 
 if [ $(date '+%Y-%m-%d') = $DATE ]
@@ -8,41 +8,20 @@ if [ $(date '+%Y-%m-%d') = $DATE ]
 fi
 
 echo 255 > /sys/class/leds/rango:amber:wan/brightness
-
-addr=(	'http://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&showintro=0&mimetype=plaintext' \
-	'https://adaway.org/hosts.txt' \
-	'https://s3.amazonaws.com/lists.disconnect.me/simple_malvertising.txt' \
-	'http://www.dshield.org/feeds/suspiciousdomains_Low.txt' \
-	'hosts-file.net/ad_servers.txt' \
-	'https://mirror.cedia.org.ec/malwaredomains/justdomains' \
-	'http://www.malwaredomainlist.com/hostslist/hosts.txt' \
-	'https://openphish.com/feed.txt' \
-	'https://palevotracker.abuse.ch/blocklists.php?download=domainblocklist' \
-	'https://ransomwaretracker.abuse.ch/downloads/RW_DOMBL.txt' \
-	'https://easylist-downloads.adblockplus.org/rolist+easylist.txt' \
-	'https://easylist-downloads.adblockplus.org/ruadlist+easylist.txt' \
-	'http://securemecca.com/Downloads/hosts.txt' \
-	'https://raw.githubusercontent.com/Dawsey21/Lists/master/main-blacklist.txt' \
-	'https://raw.githubusercontent.com/crazy-max/WindowsSpyBlocker/master/data/hosts/win10/spy.txt' \
-	'https://zeustracker.abuse.ch/blocklist.php?download=domainblocklist' \
-	'http://someonewhocares.org/hosts/hosts' \
-	'http://winhelp2002.mvps.org/hosts.txt' \
-	'http://sysctl.org/cameleon/hosts')
-
 cd /home/tmp
+i=0
 
-for ((i=0; i<${#addr[*]}; i++)); do
-
-	wget ${addr[$i]} --no-check-certificate -O hosts_list.$i
-
+while read line ; do
+addr=$line
+	i=$((i+1))
+	wget $addr --no-check-certificate -O hosts_list.$i
 	sed -i 's/0.0.0.0/127.0.0.1/' hosts_list.$i
 	sed -i '/127.0.0.1/{x;p;x;G;}' hosts_list.$i
 	sed -i 's/\t/ /g' hosts_list.$i
 	sed -i 's/  / /g' hosts_list.$i
+done < /etc/adblock.addr
 
-done
-
-in="hosts_list.*" && out="/etc/adblock" && host='127.0.0.1'
+in="hosts_list.*" && out="/etc/adblock.blacklist" && host='127.0.0.1'
 
 echo "#/ip dns static" > $out && grep '127.0.0.1 ' $in \
 	| grep -v '^#' \
@@ -51,8 +30,13 @@ echo "#/ip dns static" > $out && grep '127.0.0.1 ' $in \
 	| tr -d '\r' \
 	| sort -u \
 	| sed '$!N; /^\(.*\)\n\1$/!P; D' \
-	| sed -e '/r.mail.ru/d' \
 	| sed "s/^/$host /" >> $out && rm -f $in
+
+while read line ; do
+	sed "/$line/d" $out > "/etc/adblock.tmp"
+	mv /etc/adblock.tmp $out
+done < /etc/adblock.whitelist
+rm -f /etc/adblock.tmp
 
 wc -l $out
 /etc/init.d/dnsmasq restart
